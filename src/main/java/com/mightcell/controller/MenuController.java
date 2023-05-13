@@ -2,14 +2,18 @@ package com.mightcell.controller;
 
 import cn.dev33.satoken.util.SaResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mightcell.constant.MenuConstant;
+import com.mightcell.entity.Directory;
 import com.mightcell.entity.Menu;
 import com.mightcell.exception.CodeException;
+import com.mightcell.service.DirectoryService;
 import com.mightcell.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.invoke.LambdaMetafactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -30,6 +34,8 @@ import static com.mightcell.constant.ResultCode.SUCCESS;
 public class MenuController {
 
     private final MenuService menuService;
+
+    private final DirectoryService directoryService;
 
     /**
      * 添加菜单
@@ -166,5 +172,19 @@ public class MenuController {
     public SaResult count() {
         int count = menuService.count();
         return SaResult.ok("获取成功").setData(count).setCode(SUCCESS);
+    }
+
+    /**
+     * 获取图标列表
+     *
+     * 请求地址：/menu/icons
+     * @return 图标列表
+     */
+    @GetMapping("/icons")
+    public SaResult icons() {
+        LambdaQueryWrapper<Directory> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Directory::getType, MenuConstant.MENU_TYPE_ICON);
+        List<Directory> list = directoryService.list(queryWrapper);
+        return SaResult.ok("获取成功").setData(list).setCode(SUCCESS);
     }
 }
