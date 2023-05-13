@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author 修雯天
@@ -17,6 +18,8 @@ public class Menu implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
+    private Integer pid;
 
     private String name;
 
@@ -36,4 +39,7 @@ public class Menu implements Serializable {
 
     @TableLogic
     private Integer isDeleted;
+
+    @TableField(exist = false)
+    private List<Menu> children;
 }

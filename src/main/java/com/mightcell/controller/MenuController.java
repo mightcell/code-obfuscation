@@ -1,6 +1,7 @@
 package com.mightcell.controller;
 
 import cn.dev33.satoken.util.SaResult;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mightcell.entity.Menu;
 import com.mightcell.exception.CodeException;
 import com.mightcell.service.MenuService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.mightcell.constant.ResultCode.ERROR;
 import static com.mightcell.constant.ResultCode.SUCCESS;
@@ -136,8 +138,22 @@ public class MenuController {
      */
     @GetMapping("/list")
     public SaResult list() {
+        // 查询menu中所有的记录
         List<Menu> list = menuService.list();
-        return SaResult.ok("获取成功").setData(list).setCode(SUCCESS);
+        // 查询一级菜单
+        List<Menu> parentNode = list
+                .stream().
+                filter(menu -> Objects.isNull(menu.getPid()))
+                .collect(Collectors.toList());
+        // 封装一级菜单的子菜单
+        for (Menu menu : parentNode) {
+            menu.setChildren(list
+                    .stream()
+                    .filter(tmp -> menu.getId().equals(tmp.getPid()))
+                    .collect(Collectors.toList())
+            );
+        }
+        return SaResult.ok("获取成功").setData(parentNode).setCode(SUCCESS);
     }
 
     /**
