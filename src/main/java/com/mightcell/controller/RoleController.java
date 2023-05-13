@@ -2,13 +2,16 @@ package com.mightcell.controller;
 
 import cn.dev33.satoken.util.SaResult;
 import com.mightcell.entity.Role;
+import com.mightcell.entity.RoleMenu;
 import com.mightcell.exception.CodeException;
+import com.mightcell.service.RoleMenuService;
 import com.mightcell.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.Path;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static com.mightcell.constant.ResultCode.ERROR;
@@ -25,6 +28,8 @@ import static com.mightcell.constant.ResultCode.SUCCESS;
 public class RoleController {
 
     private final RoleService roleService;
+
+    private final RoleMenuService roleMenuService;
 
     /**
      * 添加角色
@@ -147,6 +152,34 @@ public class RoleController {
     public SaResult count() {
         int count = roleService.count();
         return SaResult.ok("获取成功").setData(count).setCode(SUCCESS);
+    }
+
+
+    /**
+     * 设置角色关系
+     *
+     * 请求地址：/role/roleMenu/{rid}/{mids}
+     * @param rid 角色id
+     * @param mids 菜单id列表
+     * @return
+     */
+    @PostMapping("/roleMenu/{rid}")
+    public SaResult setRoleMenu(@PathVariable Integer rid, @RequestBody ArrayList<Integer> mids) {
+        roleMenuService.setRoleMenu(rid, mids);
+        return SaResult.ok("设置成功").setCode(SUCCESS);
+    }
+
+    /**
+     * 查询角色绑定的菜单
+     *
+     * 请求地址：/role/roleMenu/{rid}
+     * @param rid 角色id
+     * @return 菜单列表
+     */
+    @GetMapping("/roleMenu/{rid}")
+    public SaResult getRoleMenu(@PathVariable Integer rid) {
+        ArrayList<Integer> menuList = roleMenuService.getRoleMenuList(rid);
+        return SaResult.ok("获取成功").setData(menuList).setCode(SUCCESS);
     }
 
 }
