@@ -11,4 +11,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
+    @Override
+    public Integer getByFlag(String role) {
+        return baseMapper.getByFlag(role);
+    }
 }

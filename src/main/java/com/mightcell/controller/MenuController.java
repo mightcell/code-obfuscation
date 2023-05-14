@@ -143,22 +143,8 @@ public class MenuController {
      * @return 菜单列表
      */
     @GetMapping("/list")
-    public SaResult list() {
-        // 查询menu中所有的记录
-        List<Menu> list = menuService.list();
-        // 查询一级菜单
-        List<Menu> parentNode = list
-                .stream().
-                filter(menu -> Objects.isNull(menu.getPid()))
-                .collect(Collectors.toList());
-        // 封装一级菜单的子菜单
-        for (Menu menu : parentNode) {
-            menu.setChildren(list
-                    .stream()
-                    .filter(tmp -> menu.getId().equals(tmp.getPid()))
-                    .collect(Collectors.toList())
-            );
-        }
+    public SaResult list(@RequestParam(defaultValue = "") String name) {
+        List<Menu> parentNode = menuService.findMenus(name);
         return SaResult.ok("获取成功").setData(parentNode).setCode(SUCCESS);
     }
 

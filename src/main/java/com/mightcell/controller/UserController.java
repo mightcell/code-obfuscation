@@ -2,6 +2,8 @@ package com.mightcell.controller;
 
 import cn.dev33.satoken.util.SaResult;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mightcell.entity.Menu;
+import com.mightcell.entity.RoleMenu;
 import com.mightcell.entity.User;
 import com.mightcell.entity.request.LoginBo;
 import com.mightcell.entity.request.RegisterBo;
@@ -10,12 +12,17 @@ import com.mightcell.entity.request.UserVo;
 import com.mightcell.entity.response.LoginVo;
 import com.mightcell.entity.response.UserPageDto;
 import com.mightcell.exception.CodeException;
+import com.mightcell.service.MenuService;
+import com.mightcell.service.RoleMenuService;
+import com.mightcell.service.RoleService;
 import com.mightcell.service.UserService;
 import com.mightcell.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static com.mightcell.constant.ResultCode.*;
@@ -35,6 +42,12 @@ public class UserController {
 
     private final UserService userService;
 
+    private final RoleService roleService;
+
+    private final MenuService menuService;
+
+    private final RoleMenuService roleMenuService;
+
     /**
      * 用户登录
      *
@@ -52,11 +65,39 @@ public class UserController {
             String token = TokenUtils.createToken(user.getId().toString(), user.getPassword());
             LoginVo loginVo = new LoginVo();
             loginVo.setUid(user.getId());
+            String role = user.getRole();
+            List<Menu> roleMenus = getRoleMenus(role);
+            loginVo.setMenus(roleMenus);
             loginVo.setUsername(user.getUsername());
             loginVo.setToken(token);
             return SaResult.ok("登录成功").setData(loginVo).setCode(SUCCESS);
         }
         return SaResult.error("登录失败").setCode(ERROR);
+    }
+
+    /**
+     * 获取对应角色的菜单
+     *
+     * @param role 角色
+     * @return 菜单
+     */
+    private List<Menu> getRoleMenus(String role) {
+        // 获取角色id
+        Integer rid = roleService.getByFlag(role);
+        // 根据rid查询菜单id列表
+        ArrayList<Integer> mids = roleMenuService.getRoleMenuList(rid);
+        // 查询数据库中所有的菜单
+        List<Menu> menus = menuService.findMenus("");
+        // 筛选当前用户角色菜单
+        ArrayList<Menu> roleMenus = new ArrayList<>();
+        for (Menu menu : menus) {
+            if (mids.contains(menu.getId())) {
+                roleMenus.add(menu);
+            }
+            List<Menu> children = menu.getChildren();
+            children.removeIf(child -> !mids.contains(child.getId()));
+        }
+        return roleMenus;
     }
 
     /**
