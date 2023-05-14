@@ -1,5 +1,6 @@
 package com.mightcell.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mightcell.entity.Menu;
 import com.mightcell.entity.RoleMenu;
@@ -26,15 +27,17 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu> i
         // 删除当前角色id对应所有的菜单绑定关系
         baseMapper.deleteByRoleId(rid);
 
+        ArrayList<Integer> midsCopy = CollUtil.newArrayList(mids);
         // 将菜单id列表绑定到角色id
         for (Integer mid : mids) {
             Menu menu = menuService.getById(mid);
-            if (!Objects.isNull(menu.getPid()) && !mids.contains(menu.getPid())) {
+            if (!Objects.isNull(menu.getPid()) && !midsCopy.contains(menu.getPid())) {
                 // 设置二级菜单的父级id
                 RoleMenu roleMenu = new RoleMenu();
                 roleMenu.setRid(rid);
                 roleMenu.setMid(mid);
                 baseMapper.insert(roleMenu);
+                midsCopy.add(menu.getPid());
             }
             RoleMenu roleMenu = new RoleMenu();
             roleMenu.setRid(rid);
