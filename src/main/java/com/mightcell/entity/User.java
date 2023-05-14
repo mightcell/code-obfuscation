@@ -41,6 +41,8 @@ public class User implements Serializable {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private LocalDateTime updateTime;
 
+    private String role;
+
     public UserVo getUserVo() {
         UserVo userVo = new UserVo();
         userVo.setUsername(username);

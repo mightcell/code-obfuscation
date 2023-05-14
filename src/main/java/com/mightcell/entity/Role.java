@@ -30,6 +30,8 @@ public class Role implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime updateTime;
 
+    private String flag;
+
     @TableLogic
     private Integer isDeleted;
 }
