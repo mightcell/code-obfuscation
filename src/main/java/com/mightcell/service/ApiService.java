@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mightcell.entity.File;
 import com.mightcell.entity.request.PageBo;
+import com.mightcell.entity.response.FilePageDto;
 import com.mightcell.entity.response.FileVo;
 import com.mightcell.entity.response.PageVo;
 import org.springframework.web.multipart.MultipartFile;
@@ -132,4 +133,5 @@ public interface ApiService extends IService<File> {
      */
     boolean removeRowsByIds(List<String> idList);
 
+    Page<FilePageDto> getFilePageDtoInfo(PageBo pageBo);
 }

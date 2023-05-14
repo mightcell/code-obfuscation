@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mightcell.entity.File;
 import com.mightcell.entity.request.PageBo;
+import com.mightcell.entity.response.FilePageDto;
 import com.mightcell.entity.response.FileVo;
 import com.mightcell.entity.response.PageVo;
 import com.mightcell.exception.CodeException;
@@ -12,6 +13,7 @@ import com.mightcell.service.ApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.rendering.PageDrawer;
 import org.apache.tika.Tika;
 import org.apache.tika.io.FilenameUtils;
 import org.omg.PortableInterceptor.SUCCESSFUL;
@@ -20,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.security.sasl.Sasl;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -350,6 +353,19 @@ public class ApiController {
         log.info("Start to count the protect file number of the day");
         Integer num = apiService.countFileProtectNum(day);
         return SaResult.ok("获取成功").setData(num).setCode(SUCCESS);
+    }
+
+    @GetMapping("/file/manage")
+    public SaResult getFilePage(@RequestBody PageBo pageBo) {
+        if (Objects.isNull(pageBo)) {
+            log.info("PageBo is null");
+            throw new CodeException("分页参数接收对象为空");
+        }
+        Page<FilePageDto> pageInfo = apiService.getFilePageDtoInfo(pageBo);
+        if (!Objects.isNull(pageInfo)) {
+            return SaResult.ok("获取成功").setData(pageInfo).setCode(SUCCESS);
+        }
+        return SaResult.error("获取失败").setCode(ERROR);
     }
 
 }

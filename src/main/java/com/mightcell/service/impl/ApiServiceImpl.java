@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mightcell.entity.File;
 import com.mightcell.entity.User;
 import com.mightcell.entity.request.PageBo;
+import com.mightcell.entity.response.FilePageDto;
 import com.mightcell.entity.response.FileVo;
 import com.mightcell.entity.response.PageVo;
 import com.mightcell.exception.CodeException;
@@ -386,6 +387,41 @@ public class ApiServiceImpl extends ServiceImpl<FileMapper, File> implements Api
         return file;
     }
 
+    @Override
+    public Page<FilePageDto> getFilePageDtoInfo(PageBo pageBo) {
+        Integer page = pageBo.getPage();
+        Integer limit = pageBo.getLimit();
+        String fileName = pageBo.getFileName();
+        Page<File> pageInfo = new Page<>(page, limit);
+
+        LambdaQueryWrapper<File> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(File::getCreateTime);
+        if (StringUtils.isNotBlank(fileName)) {
+            queryWrapper.likeRight(File::getOriginalFile, fileName);
+        }
+        baseMapper.selectPage(pageInfo, queryWrapper);
+
+        List<File> records = pageInfo.getRecords();
+        List<FilePageDto> filePageDtos = records
+                .stream()
+                .map(this::getTargetFilePage)
+                .collect(Collectors.toList());
+        Page<FilePageDto> resPageInfo = new Page<>(page, limit, pageInfo.getTotal());
+        resPageInfo.setRecords(filePageDtos);
+        return resPageInfo;
+    }
+
+    private FilePageDto getTargetFilePage(File file) {
+        FilePageDto filePageDto = new FilePageDto();
+        filePageDto.setId(file.getId());
+        filePageDto.setFileName(file.getOriginalFileName());
+        filePageDto.setFileSize(file.getMemory());
+        filePageDto.setFileLocation(file.getStore());
+        filePageDto.setType(file.getType());
+        filePageDto.setCreateTime(file.getCreateTime());
+        return filePageDto;
+    }
+
 
     /**
      * 分页查询
@@ -683,6 +719,8 @@ public class ApiServiceImpl extends ServiceImpl<FileMapper, File> implements Api
         int count = baseMapper.deleteBatchIds(idList);
         return count > 0;
     }
+
+
 
     /**
      * 获取文件id（文件名）
