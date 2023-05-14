@@ -153,9 +153,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Page<UserPageDto> getUserPage(UserPageBo userPageBo) {
         Integer pageNum = userPageBo.getPageNum();
         Integer pageSize = userPageBo.getPageSize();
+        if (Objects.isNull(pageNum) || Objects.isNull(pageSize)) {
+            log.error("分页查询的两个必要参数为空");
+            throw new CodeException("分页查询参数缺失");
+        }
         String username = userPageBo.getUsername();
 
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<User> pageInfo = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<User> pageInfo =
+                new com.baomidou.
+                        mybatisplus.extension.
+                        plugins.pagination.Page<>(pageNum, pageSize);
 
         // 分页条件查询
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();

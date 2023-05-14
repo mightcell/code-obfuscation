@@ -391,6 +391,10 @@ public class ApiServiceImpl extends ServiceImpl<FileMapper, File> implements Api
     public Page<FilePageDto> getFilePageDtoInfo(PageBo pageBo) {
         Integer page = pageBo.getPage();
         Integer limit = pageBo.getLimit();
+        if (Objects.isNull(page) || Objects.isNull(limit)) {
+            log.info("分页查询两个必要参数为空");
+            throw new CodeException("分页查询参数缺失");
+        }
         String fileName = pageBo.getFileName();
         Page<File> pageInfo = new Page<>(page, limit);
 

@@ -173,7 +173,7 @@ public class UserController {
      * @return 封装用户页面数据
      */
     @GetMapping("/page")
-    public SaResult page(@RequestBody UserPageBo userPageBo) {
+    public SaResult page(UserPageBo userPageBo) {
         if (Objects.isNull(userPageBo)) {
             log.info("用户分页查询反序列化类为空");
             throw new CodeException("分页参数接收对象为空");

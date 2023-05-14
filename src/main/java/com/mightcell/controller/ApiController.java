@@ -356,7 +356,7 @@ public class ApiController {
     }
 
     @GetMapping("/file/manage")
-    public SaResult getFilePage(@RequestBody PageBo pageBo) {
+    public SaResult getFilePage(PageBo pageBo) {
         if (Objects.isNull(pageBo)) {
             log.info("PageBo is null");
             throw new CodeException("分页参数接收对象为空");
