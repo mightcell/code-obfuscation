@@ -1,19 +1,19 @@
 package com.mightcell.controller;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.pagehelper.PageInfo;
 import com.mightcell.entity.User;
-import com.mightcell.entity.request.*;
+import com.mightcell.entity.request.LoginBo;
+import com.mightcell.entity.request.RegisterBo;
+import com.mightcell.entity.request.UserPageBo;
+import com.mightcell.entity.request.UserVo;
+import com.mightcell.entity.response.LoginVo;
 import com.mightcell.entity.response.UserPageDto;
 import com.mightcell.exception.CodeException;
 import com.mightcell.service.UserService;
+import com.mightcell.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.SUCCESSFUL;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -49,10 +49,12 @@ public class UserController {
         }
         User user = userService.userLogin(loginBo);
         if (!Objects.isNull(user)) {
-            StpUtil.login(user.getId());
-            StpUtil.getSession().set("user", user);
-            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
-            return SaResult.ok("登录成功").setData(tokenInfo).setCode(SUCCESS);
+            String token = TokenUtils.createToken(user.getId().toString(), user.getPassword());
+            LoginVo loginVo = new LoginVo();
+            loginVo.setUid(user.getId());
+            loginVo.setUsername(user.getUsername());
+            loginVo.setToken(token);
+            return SaResult.ok("登录成功").setData(loginVo).setCode(SUCCESS);
         }
         return SaResult.error("登录失败").setCode(ERROR);
     }
@@ -79,18 +81,14 @@ public class UserController {
      */
     @GetMapping("/logout")
     public SaResult userLogout() {
-        User user = (User) StpUtil.getSession().get("user");
-        Integer id = user.getId();
-        user.setIsLogin(IS_LOGOUT);
-        userService.updateById(user);
-        StpUtil.logout(user.getId());
+        User currentUser = TokenUtils.getCurrentUser();
+        assert currentUser != null;
+        Integer id = currentUser.getId();
+        currentUser.setIsLogin(IS_LOGOUT);
+        userService.updateById(currentUser);
         return SaResult.ok("退出成功").setCode(NO_CONTENT);
     }
 
-    @GetMapping("/status")
-    public SaResult userLoginStatus() {
-        return SaResult.ok("是否登录：" + StpUtil.isLogin()).setCode(SUCCESS);
-    }
 
     @GetMapping("/query/{id}")
     public SaResult getUserInfoById(@PathVariable Long id) {

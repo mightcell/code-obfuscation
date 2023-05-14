@@ -65,6 +65,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return null;
         }
 
+        // 3、确认用户是否被禁用
+        if (!user.getStatus().equals(0)) {
+            return null;
+        }
+
         user.setIsLogin(IS_LOGIN);
         baseMapper.updateById(user);
 
