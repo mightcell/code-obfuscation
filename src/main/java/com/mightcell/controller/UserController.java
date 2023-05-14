@@ -67,6 +67,7 @@ public class UserController {
             loginVo.setUid(user.getId());
             String role = user.getRole();
             List<Menu> roleMenus = getRoleMenus(role);
+            loginVo.setRole(role);
             loginVo.setMenus(roleMenus);
             loginVo.setUsername(user.getUsername());
             loginVo.setToken(token);

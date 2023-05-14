@@ -24,6 +24,8 @@ public class User implements Serializable {
 
     private String phone;
 
+    private String role;
+
     private String email;
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -41,7 +43,6 @@ public class User implements Serializable {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private LocalDateTime updateTime;
 
-    private String role;
 
     public UserVo getUserVo() {
         UserVo userVo = new UserVo();
