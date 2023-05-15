@@ -29,5 +29,4 @@ dependency-reduced-pom.xml
 flyway.properties
 _book/
 site/
-application.yml
 tmp/file/
