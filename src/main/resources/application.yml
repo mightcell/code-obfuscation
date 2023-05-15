@@ -54,6 +54,16 @@ file:
   # 本地地址
   localUrl: "D:/Code/Java/upload/files/"
 
+# 监控
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [helath, metrics, mappings, httptrace]
+
 
 
 
